@@ -1,4 +1,5 @@
-const { createStore } = require("redux");
+const { createStore, combineReducers, applyMiddleware } = require("redux");
+const { default: logger } = require("redux-logger");
 // constant
 const INCREMENT = "INCREMENT";
 const DECREMENT = "DECREMENT";
@@ -18,7 +19,7 @@ const initialProductsState = {
 };
 
 // action
-const action = (actionType, payload) => {
+const action = (actionType, payload = {}) => {
   return {
     type: actionType,
     payload,
@@ -47,24 +48,48 @@ const countReducer = (state = initialState, action) => {
       }
 
     case GET_USERS:
-      return {
-        ...state.users,
-      };
+      return state.users;
 
     default:
       return state;
   }
 };
 
+// reducer for products
+const productsReducer = (state = initialProductsState, action) => {
+  switch (action.type) {
+    case ADD_PRODUCT:
+      if (Object.keys(action.payload).length !== 0) {
+        return {
+          ...state,
+          products: [...state.products, action.payload],
+        };
+      }
+
+    case GET_PRODUCTS:
+      return state.products;
+
+    default:
+      return state;
+  }
+};
+
+// rootReducer
+
+const rootReducer = combineReducers({
+  countR: countReducer,
+  productsR: productsReducer,
+});
+
 // store
-const store = createStore(countReducer);
+const store = createStore(rootReducer, applyMiddleware(logger));
 
 // subscribe
 store.subscribe(() => {
   console.log(store.getState());
 });
 
-// action dispatch
+// action dispatch - user and counter
 
 store.dispatch(action(INCREMENT));
 store.dispatch(action(INCREMENT));
@@ -79,4 +104,20 @@ store.dispatch(action(ADD_USER, { name: "md kowser" }));
 store.dispatch(action(ADD_USER, { name: "md kader" }));
 store.dispatch(action(ADD_USER, { name: "md ridoy" }));
 store.dispatch(action(ADD_USER, { name: "md rony" }));
-store.dispatch(action(GET_USERS));
+// store.dispatch(action(GET_USERS));
+
+// action dispatch for products
+
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook \pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook pro" }));
+store.dispatch(action(ADD_PRODUCT, { name: "macbook" }));
+// store.dispatch(action(GET_PRODUCTS));
